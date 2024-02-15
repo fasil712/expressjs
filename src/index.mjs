@@ -11,7 +11,6 @@ const loggingMiddleWare = (req, res, next) => {
 };
 
 const resolvingIndex = (req, res, next) => {
-  
   next();
 };
 
