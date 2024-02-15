@@ -28,7 +28,7 @@ Explore advanced techniques and best practices in Express.js with our comprehens
 To get started, clone this repository:
 
 ```bash
-git clone https://github.com/yourusername/express-advanced-training.git
+git clone https://github.com/fasil712/expressjs.git
 ```
 
 ### Contribution
@@ -42,6 +42,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 Happy coding! 🚀
-```
-
-Feel free to customize the content, replace `yourusername` with the actual username of the repository owner, and add more sections or details as needed.
