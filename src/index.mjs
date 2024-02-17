@@ -1,4 +1,5 @@
 import express from "express";
+import { query } from "express-validator";
 
 const app = express();
 app.use(express.json());
@@ -10,7 +11,16 @@ const loggingMiddleWare = (req, res, next) => {
   next();
 };
 
-const resolvingIndex = (req, res, next) => {
+const resolvingIndexByUserId = (req, res, next) => {
+  const {
+    body,
+    params: { id },
+  } = req;
+  const parsedId = parseInt(id);
+  if (isNaN(parsedId)) return res.sendStatus(400);
+  const findUserIndex = monckUsers.findIndex((user) => user.id === parsedId);
+  if (findUserIndex == -1) return res.sendStatus(404);
+  req.findUserIndex = findUserIndex;
   next();
 };
 
@@ -26,6 +36,7 @@ const monckUsers = [
 ];
 
 app.get("/api/users", (req, res) => {
+  console.log(query);
   res.send(monckUsers);
 });
 
@@ -45,16 +56,9 @@ app.post("/api/users", (req, res) => {
   res.send(newUser);
 });
 
-app.put("/api/users/:id", (req, res) => {
-  const {
-    body,
-    params: { id },
-  } = req;
-  const parsedId = parseInt(id);
-  if (isNaN(parsedId)) return res.sendStatus(400);
-  const findUserIndex = monckUsers.findIndex((user) => user.id === parsedId);
-  if (findUserIndex == -1) return res.sendStatus(404);
-  monckUsers[findUserIndex] = { id: parsedId, ...body };
+app.put("/api/users/:id", resolvingIndexByUserId, (req, res) => {
+  const { body, findUserIndex } = req;
+  monckUsers[findUserIndex] = { id: monckUsers[findUserIndex].id, ...body };
   res.sendStatus(200);
 });
 
