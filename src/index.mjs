@@ -1,5 +1,5 @@
 import express from "express";
-import { query } from "express-validator";
+import { body, query, validationResult } from "express-validator";
 
 const app = express();
 app.use(express.json());
@@ -35,10 +35,20 @@ const monckUsers = [
   { id: 2, name: "Hana Getie", email: "hana@gmail.com" },
 ];
 
-app.get("/api/users", (req, res) => {
-  console.log(query);
-  res.send(monckUsers);
-});
+app.get(
+  "/api/users",
+  query("filter")
+    .isString()
+    .notEmpty()
+    .withMessage("Nust not be empty")
+    .isLength({ min: 3, max: 10 })
+    .withMessage("Must be 3-10 characters"),
+  (req, res) => {
+    const result = validationResult(req);
+    console.log(result);
+    res.send(monckUsers);
+  }
+);
 
 app.get("/api/users/:id", (req, res) => {
   const parsedId = parseInt(req.params.id);
@@ -48,13 +58,31 @@ app.get("/api/users/:id", (req, res) => {
   res.send(monckUser);
 });
 
-app.post("/api/users", (req, res) => {
-  const { body } = req;
-  if (monckUsers.length == 0) return monckUsers.push({ id: 1, ...body });
-  const newUser = { id: monckUsers[monckUsers.length - 1].id + 1, ...body };
-  monckUsers.push(newUser);
-  res.send(newUser);
-});
+app.post(
+  "/api/users",
+  [
+    body("name")
+      .notEmpty()
+      .withMessage("Name cannot be empty")
+      .isLength({ min: 5, max: 30 })
+      .withMessage(
+        "Name must be at least 5 characters with a max of 30 characters"
+      )
+      .isString()
+      .withMessage("Name must be a string"),
+    body("email").notEmpty(),
+  ],
+
+  (req, res) => {
+    const result = validationResult(req);
+    console.log(result);
+    const { body } = req;
+    if (monckUsers.length == 0) return monckUsers.push({ id: 1, ...body });
+    const newUser = { id: monckUsers[monckUsers.length - 1].id + 1, ...body };
+    monckUsers.push(newUser);
+    res.send(newUser);
+  }
+);
 
 app.put("/api/users/:id", resolvingIndexByUserId, (req, res) => {
   const { body, findUserIndex } = req;
