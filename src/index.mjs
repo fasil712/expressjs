@@ -1,5 +1,12 @@
 import express from "express";
-import { body, query, validationResult } from "express-validator";
+import {
+  body,
+  checkSchema,
+  matchedData,
+  query,
+  validationResult,
+} from "express-validator";
+import { createUserValidationSchema } from "./utils/validationSchemas.mjs";
 
 const app = express();
 app.use(express.json());
@@ -58,31 +65,20 @@ app.get("/api/users/:id", (req, res) => {
   res.send(monckUser);
 });
 
-app.post(
-  "/api/users",
-  [
-    body("name")
-      .notEmpty()
-      .withMessage("Name cannot be empty")
-      .isLength({ min: 5, max: 30 })
-      .withMessage(
-        "Name must be at least 5 characters with a max of 30 characters"
-      )
-      .isString()
-      .withMessage("Name must be a string"),
-    body("email").notEmpty(),
-  ],
-
-  (req, res) => {
-    const result = validationResult(req);
-    console.log(result);
-    const { body } = req;
-    if (monckUsers.length == 0) return monckUsers.push({ id: 1, ...body });
-    const newUser = { id: monckUsers[monckUsers.length - 1].id + 1, ...body };
-    monckUsers.push(newUser);
-    res.send(newUser);
+app.post("/api/users", checkSchema(createUserValidationSchema), (req, res) => {
+  const result = validationResult(req);
+  console.log(result);
+  if (!result.isEmpty()) {
+    return res.status(400).send({ error: result.array() });
   }
-);
+  const data = matchedData(req);
+  console.log(data);
+  const { body } = req;
+  if (monckUsers.length == 0) return monckUsers.push({ id: 1, ...body });
+  const newUser = { id: monckUsers[monckUsers.length - 1].id + 1, ...body };
+  monckUsers.push(newUser);
+  res.send(newUser);
+});
 
 app.put("/api/users/:id", resolvingIndexByUserId, (req, res) => {
   const { body, findUserIndex } = req;
