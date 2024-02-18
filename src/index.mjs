@@ -1,6 +1,5 @@
 import express from "express";
-import userRoutes from "./routes/users.mjs";
-import productRoutes from "./routes/products.mjs";
+import routes from "./routes/index.mjs";
 
 const app = express();
 app.use(express.json());
@@ -11,8 +10,7 @@ app.get("/", (req, res) => {
   res.send({ res: "Its Working !!!" });
 });
 
-app.use(userRoutes);
-app.use(productRoutes);
+app.use(routes);
 
 app.listen(PORT, () => {
   console.log(`Running with port ${PORT}.`);
