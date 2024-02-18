@@ -5,13 +5,13 @@ import routes from "./routes/index.mjs";
 const app = express();
 app.use(express.json());
 
-app.use(cookieParser());
+app.use(cookieParser("cookie_secret"));
 app.use(routes);
 
 const PORT = process.env.PORT || 4000;
 
 app.get("/", (req, res) => {
-  res.cookie("Hello", "World", { maxAge: 5000 * 10 });
+  res.cookie("hello", "World", { maxAge: 5000 * 10, signed: true });
   res.send({ res: "Its Working !!!" });
 });
 
