@@ -9,6 +9,7 @@ import { monckUsers } from "../utils/constants.mjs";
 import { createUserValidationSchema } from "../utils/validationSchemas.mjs";
 import { resolvingIndexByUserId } from "../utils/middleware.mjs";
 import { User } from "../mongoose/schemas/user.mjs";
+import { hashPassword } from "../utils/helpers.mjs";
 
 const router = Router();
 
@@ -42,6 +43,8 @@ router.post(
     const result = validationResult(req);
     if (!result.isEmpty()) return send(result.array());
     const data = matchedData(req);
+    console.log(data);
+    data.password = hashPassword(data.password);
     console.log(data);
     const { body } = req;
     const newUser = new User(body);
