@@ -34,15 +34,15 @@ app.get("/", (req, res) => {
 });
 
 app.post("/api/auth", passport.authenticate("local"), (req, res) => {
-  // const {
-  //   body: { email, password },
-  // } = req;
-  // const findUser = monckUsers.find((user) => user.email === email);
-  // if (!findUser || findUser.password !== password) {
-  //   return res.status(401).send({ msg: "BAD CREADENTIALS" });
-  // }
-  // req.session.user = findUser;
-  // return res.status(200).send(findUser);
+  const {
+    body: { email, password },
+  } = req;
+  const findUser = monckUsers.find((user) => user.email === email);
+  if (!findUser || findUser.password !== password) {
+    return res.status(401).send({ msg: "BAD CREADENTIALS" });
+  }
+  req.session.user = findUser;
+  return res.status(200).send(findUser);
 });
 
 app.get("/api/auth/status", (req, res) => {

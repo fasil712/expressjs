@@ -1,5 +1,5 @@
 import passport from "passport";
-import { Strategy } from "passport";
+import { Strategy } from "passport-local";
 import { monckUsers } from "../utils/constants.mjs";
 
 export default passport.use(
