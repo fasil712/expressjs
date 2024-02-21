@@ -65,6 +65,7 @@ router.get("/api/users/:id", (req, res) => {
   if (!monckUser) return res.sendStatus(404);
   res.send(monckUser);
 });
+
 router.put("/api/users/:id", resolvingIndexByUserId, (req, res) => {
   const { body, findUserIndex } = req;
   monckUsers[findUserIndex] = { id: monckUsers[findUserIndex].id, ...body };
