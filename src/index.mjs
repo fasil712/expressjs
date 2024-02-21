@@ -4,6 +4,7 @@ import session from "express-session";
 import routes from "./routes/index.mjs";
 import passport from "passport";
 import "./strategies/local-strategy.mjs";
+import { monckUsers } from "./utils/constants.mjs";
 
 const app = express();
 app.use(express.json());
@@ -35,9 +36,9 @@ app.get("/", (req, res) => {
 
 app.post("/api/auth", passport.authenticate("local"), (req, res) => {
   const {
-    body: { email, password },
+    body: { username, password },
   } = req;
-  const findUser = monckUsers.find((user) => user.email === email);
+  const findUser = monckUsers.find((user) => user.username === username);
   if (!findUser || findUser.password !== password) {
     return res.status(401).send({ msg: "BAD CREADENTIALS" });
   }
@@ -46,11 +47,11 @@ app.post("/api/auth", passport.authenticate("local"), (req, res) => {
 });
 
 app.get("/api/auth/status", (req, res) => {
-  req.sessionStore.get(req.sessionID, (err, session) => {
-    console.log(session);
-  });
-  return req.session.user
-    ? res.status(200).send(req.session.user)
+  console.log("Inside /auth/status endpoint");
+  console.log(req.user);
+  console.log(req.session);
+  return req.user
+    ? res.status(200).send(req.user)
     : res.status(401).send({ msg: "Not Authenticated" });
 });
 
