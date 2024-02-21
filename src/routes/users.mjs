@@ -8,6 +8,7 @@ import {
 import { monckUsers } from "../utils/constants.mjs";
 import { createUserValidationSchema } from "../utils/validationSchemas.mjs";
 import { resolvingIndexByUserId } from "../utils/middleware.mjs";
+import { User } from "../mongoose/schemas/user.mjs";
 
 const router = Router();
 
@@ -33,24 +34,37 @@ router.get(
     res.send(monckUsers);
   }
 );
-router.post(
-  "/api/users",
-  checkSchema(createUserValidationSchema),
-  (req, res) => {
-    const result = validationResult(req);
-    console.log(result);
-    if (!result.isEmpty()) {
-      return res.status(400).send({ error: result.array() });
-    }
-    const data = matchedData(req);
-    console.log(data);
-    const { body } = req;
-    if (monckUsers.length == 0) return monckUsers.push({ id: 1, ...body });
-    const newUser = { id: monckUsers[monckUsers.length - 1].id + 1, ...body };
-    monckUsers.push(newUser);
-    res.send(newUser);
+
+router.post("/api/users", async (req, res) => {
+  const { body } = req;
+  const newUser = new User(body);
+  try {
+    const savedUser = await newUser.save();
+    return res.status(201).send(savedUser);
+  } catch (error) {
+    console.log(error);
+    return res.sendStatus(400);
   }
-);
+});
+
+// router.post(
+//   "/api/users",
+//   checkSchema(createUserValidationSchema),
+//   (req, res) => {
+//     const result = validationResult(req);
+//     console.log(result);
+//     if (!result.isEmpty()) {
+//       return res.status(400).send({ error: result.array() });
+//     }
+//     const data = matchedData(req);
+//     console.log(data);
+//     const { body } = req;
+//     if (monckUsers.length == 0) return monckUsers.push({ id: 1, ...body });
+//     const newUser = { id: monckUsers[monckUsers.length - 1].id + 1, ...body };
+//     monckUsers.push(newUser);
+//     res.send(newUser);
+//   }
+// );
 router.get("/api/users/:id", (req, res) => {
   const parsedId = parseInt(req.params.id);
   if (isNaN(parsedId)) return res.sendStatus(400);
