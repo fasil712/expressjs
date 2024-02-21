@@ -3,8 +3,19 @@ import cookieParser from "cookie-parser";
 import session from "express-session";
 import routes from "./routes/index.mjs";
 import passport from "passport";
+import mongoose from "mongoose";
+
 import "./strategies/local-strategy.mjs";
 import { monckUsers } from "./utils/constants.mjs";
+
+mongoose
+  .connect("mongodb://localhost/expressjsdb")
+  .then(() => {
+    console.log("Connected to Database");
+  })
+  .catch((err) => {
+    console.log(`Erroor : ${err}`);
+  });
 
 const app = express();
 app.use(express.json());
@@ -53,6 +64,16 @@ app.get("/api/auth/status", (req, res) => {
   return req.user
     ? res.status(200).send(req.user)
     : res.status(401).send({ msg: "Not Authenticated" });
+});
+
+app.post("/api/auth/logout", (req, res) => {
+  if (!req.user) {
+    return res.sendStatus(400);
+  }
+  req.logOut((err) => {
+    if (err) return res.sendStatus(400);
+    res.send(200);
+  });
 });
 
 app.post("/api/cart", (req, res) => {
